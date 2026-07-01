@@ -35,7 +35,9 @@
         }
 
         .clock-widget {
-            position: relative;
+            position: fixed;
+            top: 20px;
+            right: 20px;
             width: 366px;
             height: 133px;
             background-image: url('background.jpg');
@@ -44,6 +46,12 @@
             color: #000;
             font-family: 'W95FA', 'Courier New', monospace;
             user-select: none;
+            cursor: grab;
+            z-index: 10;
+        }
+
+        .clock-widget.dragging {
+            cursor: grabbing;
         }
 
         .clock-time {
@@ -75,7 +83,7 @@
             position: absolute;
             top: 92px;
             left: 20px;
-            font-family: 'Microsoft Sans Serif', Arial, sans-serif;
+            font-family: 'W95FA', 'Courier New', monospace;
             font-size: 12px;
             color: #000;
             white-space: nowrap;
@@ -107,7 +115,7 @@
             document.addEventListener('click', startAudio);
             document.addEventListener('keydown', startAudio);
         });
-
+        
         let use12Hour = true;
 
         const h1 = document.getElementById('h1');
@@ -159,6 +167,65 @@
             use12Hour = !use12Hour;
             updateClock();
         });
+
+        const widget = document.getElementById('clockWidget');
+        let isDragging = false;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        function startDrag(clientX, clientY) {
+            const rect = widget.getBoundingClientRect();
+            isDragging = true;
+            dragOffsetX = clientX - rect.left;
+            dragOffsetY = clientY - rect.top;
+
+            widget.style.left = rect.left + 'px';
+            widget.style.top = rect.top + 'px';
+            widget.style.right = 'auto';
+
+            widget.classList.add('dragging');
+        }
+
+        function moveDrag(clientX, clientY) {
+            if (!isDragging) return;
+            let newLeft = clientX - dragOffsetX;
+            let newTop = clientY - dragOffsetY;
+
+            newLeft = Math.max(0, Math.min(window.innerWidth - widget.offsetWidth, newLeft));
+            newTop = Math.max(0, Math.min(window.innerHeight - widget.offsetHeight, newTop));
+
+            widget.style.left = newLeft + 'px';
+            widget.style.top = newTop + 'px';
+        }
+
+        function endDrag() {
+            isDragging = false;
+            widget.classList.remove('dragging');
+        }
+
+        widget.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            startDrag(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            moveDrag(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('mouseup', endDrag);
+
+        widget.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            startDrag(touch.clientX, touch.clientY);
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const touch = e.touches[0];
+            moveDrag(touch.clientX, touch.clientY);
+        }, { passive: true });
+
+        document.addEventListener('touchend', endDrag);
     </script>
 </body>
 </html>
