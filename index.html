@@ -23,5 +23,20 @@
     </style>
 </head>
 <body>
+    <audio id="bgMusic" src="song.wav" loop autoplay></audio>
+
+    <script>
+        const audio = document.getElementById('bgMusic');
+
+        audio.play().catch(() => {
+            const startAudio = () => {
+                audio.play();
+                document.removeEventListener('click', startAudio);
+                document.removeEventListener('keydown', startAudio);
+            };
+            document.addEventListener('click', startAudio);
+            document.addEventListener('keydown', startAudio);
+        });
+    </script>
 </body>
 </html>
