@@ -87,7 +87,8 @@
 </head>
 <body>
 
-    <audio id="bgMusic" src="song.mp3" loop autoplay></audio>
+    <audio id="bgMusic" src="song.mp3" loop></audio>
+    <audio id="midnightMusic" src="songM.mp3" loop></audio>
 
     <div class="clock-widget" id="clockWidget">
         <div class="clock-time" id="clockTime">
@@ -97,18 +98,43 @@
     </div>
 
     <script>
-        const audio = document.getElementById('bgMusic');
+        const bgMusic = document.getElementById('bgMusic');
+        const midnightMusic = document.getElementById('midnightMusic');
 
-        audio.play().catch(() => {
-            setTimeout(() => {
-                const events = ['click', 'keydown', 'touchstart', 'mousemove', 'scroll', 'pointerdown'];
-                const startAudio = () => {
-                    audio.play();
-                    events.forEach(evt => document.removeEventListener(evt, startAudio));
-                };
-                events.forEach(evt => document.addEventListener(evt, startAudio, { once: true, passive: true }));
-            }, 1000);
-        });
+        function isMidnightHour() {
+            return new Date().getHours() === 0;
+        }
+
+        function getExpectedAudio() {
+            return isMidnightHour() ? midnightMusic : bgMusic;
+        }
+
+        let activeAudio = getExpectedAudio();
+
+        function tryPlay(audioEl) {
+            audioEl.play().catch(() => {
+                setTimeout(() => {
+                    const events = ['click', 'keydown', 'touchstart', 'mousemove', 'scroll', 'pointerdown'];
+                    const startAudio = () => {
+                        audioEl.play();
+                        events.forEach(evt => document.removeEventListener(evt, startAudio));
+                    };
+                    events.forEach(evt => document.addEventListener(evt, startAudio, { once: true, passive: true }));
+                }, 1000);
+            });
+        }
+
+        tryPlay(activeAudio);
+
+        function checkMidnightSwitch() {
+            const expected = getExpectedAudio();
+            if (expected !== activeAudio) {
+                activeAudio.pause();
+                activeAudio.currentTime = 0;
+                activeAudio = expected;
+                tryPlay(activeAudio);
+            }
+        }
 
         let use12Hour = true;
 
@@ -151,6 +177,8 @@
             s2.textContent = sStr[1];
 
             dateEl.textContent = `${weekdays[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+            checkMidnightSwitch();
         }
 
         updateClock();
