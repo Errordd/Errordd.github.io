@@ -1,0 +1,72 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #288183;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@font-face {
+    font-family: 'W95FA';
+    src: url('W95F.otf') format('opentype');
+    font-display: swap;
+}
+
+.clock-widget {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 366px;
+    height: 133px;
+    background-image: url('background.jpg');
+    background-size: 366px 133px;
+    background-repeat: no-repeat;
+    color: #000;
+    font-family: 'W95FA', 'Courier New', monospace;
+    user-select: none;
+    z-index: 10;
+}
+
+.clock-time {
+    position: absolute;
+    top: 44px;
+    left: 20px;
+    display: flex;
+    align-items: baseline;
+    font-size: 36px;
+    line-height: 1;
+    letter-spacing: 0px;
+}
+
+.clock-time .digit,
+.clock-time .colon {
+    display: inline-block;
+    text-align: center;
+}
+
+.clock-time .digit {
+    width: 20px;
+}
+
+.clock-time .colon {
+    width: 14px;
+}
+
+.clock-date {
+    position: absolute;
+    top: 92px;
+    left: 20px;
+    font-family: 'W95FA', 'Courier New', monospace;
+    font-size: 12px;
+    color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
